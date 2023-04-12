@@ -18,7 +18,7 @@ import os
 # Routing for your application.
 ###
 
-@app.route("/api/v1/movies", methods=['POST', 'GET'])
+@app.route("/api/v1/movies", methods=['POST'])
 def movies():
     form = MovieForm()
 
@@ -41,8 +41,7 @@ def movies():
             return jsonify(response), 200
         else:
             return jsonify({"errors":form_errors(form)}), 400
-    if request.method == 'GET':
-       return jsonify({"Movies":getMovies()}), 200
+ 
 
 
 @app.route('/api/v1/csrf-token', methods=['GET'])
@@ -50,8 +49,8 @@ def get_csrf():
   return jsonify({'csrf_token': generate_csrf()})
   
 
-
-def getMovies():
+@app.route("/api/v1/movies", methods=['Get'])
+def add_movies():
     movies = db.session.execute(db.select(Movie)).scalars()
     movieslst=[]
     for movie in movies:
@@ -62,7 +61,7 @@ def getMovies():
             "poster": f"/api/v1/posters/{movie.poster}" 
         }
         movieslst.append(output)
-    return movieslst
+    return jsonify({"Movies":movieslst}), 200
 
 @app.route("/api/v1/posters/<filename>")
 def getPoster(filename):
